@@ -71,16 +71,8 @@ extension AdventureViewModel {
         }
     }
     
-    func updateAdventureView(content: ActivityContent<AdventureAttributes.ContentState>) {
-        
-    }
-    
-    func observeActivityUpdates(_ activity: Activity<AdventureAttributes>) {
-        // Observe updates for ongoing Live Activities.
-        Task {
-            for await content in activity.contentUpdates {
-                self.updateAdventureView(content: content)
-            }
-        }
-    }
+    // Content updates from push notifications are handled by the
+    // activityObserverTask in AdventureView.swift via activity.contentUpdates.
+    // The widget extension (EmojiRangerWidgetExtension) handles Lock Screen /
+    // Dynamic Island rendering independently — it is woken directly by APNs.
 }

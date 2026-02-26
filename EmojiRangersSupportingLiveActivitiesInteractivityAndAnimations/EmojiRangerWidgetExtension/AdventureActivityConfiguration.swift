@@ -64,7 +64,10 @@ struct AdventureActivityConfiguration: Widget {
         }
         
         DynamicIslandExpandedRegion(.trailing) {
-            TwoLineStatsView(hero: hero, isStale: isStale)
+            HStack(spacing: 4) {
+                MasterPortraitView(size: 28)
+                TwoLineStatsView(hero: hero, isStale: isStale)
+            }
         }
         
         DynamicIslandExpandedRegion(.bottom) {

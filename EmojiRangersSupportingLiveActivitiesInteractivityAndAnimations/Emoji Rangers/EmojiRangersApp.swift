@@ -27,12 +27,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "EmojiRangers", category: "Push")
 
+    // Retained so the async streams are not cancelled prematurely.
+    private var pushPermissionTask: Task<Void, Never>?
+    private var pushToStartObserverTask: Task<Void, Never>?
+
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
-        Task { await requestPushPermissions() }
+        pushPermissionTask = Task { await requestPushPermissions() }
         observePushToStartToken()
         return true
     }
@@ -90,20 +94,26 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     /// On iOS 18+, include `"input-push-token": 1` in the APNs payload to receive a
     /// refreshed token that can be used to start a new Live Activity via push.
     private func observePushToStartToken() {
-        Task {
-            if #available(iOS 17.2, *) {
-                for await tokenData in Activity<AdventureAttributes>.pushToStartTokenUpdates {
-                    let tokenString = tokenData.reduce("") { $0 + String(format: "%02x", $1) }
-                    let bundleID = Bundle.main.bundleIdentifier ?? "<bundle-id>"
-                    // Use THIS token (not the APNs device token) to start a Live Activity via push.
-                    // APNs topic must be: <bundle-id>.push-type.liveactivity
-                    logger.info("""
-                        [Push-to-Start] Token (use for Live Activity start push):
-                          token : \(tokenString)
-                          topic : \(bundleID).push-type.liveactivity
-                        """)
-                    // TODO: Send tokenString + topic to your server.
-                }
+        guard #available(iOS 17.2, *) else { return }
+        // Retained on self — keeps the stream alive for the entire app session.
+        // The stream only emits when the token is first issued or rotated by APNs,
+        // NOT on every app launch, so this is safe and cheap to observe continuously.
+        pushToStartObserverTask = Task {
+            for await tokenData in Activity<AdventureAttributes>.pushToStartTokenUpdates {
+                let tokenString = tokenData.reduce("") { $0 + String(format: "%02x", $1) }
+                let bundleID = Bundle.main.bundleIdentifier ?? "<bundle-id>"
+                // Use THIS token (not the APNs device token) to start a Live Activity via push.
+                // APNs topic must be: <bundle-id>.push-type.liveactivity
+                logger.info("""
+                    [Push-to-Start] Token (use for Live Activity start push):
+                      token : \(tokenString)
+                      topic : \(bundleID).push-type.liveactivity
+                    """)
+                // TODO: Send tokenString + topic to your server.
+                // IMPORTANT: Always replace the previously stored token — the old one
+                // is immediately invalid once a new token is issued. In the sandbox
+                // (development) environment APNs rotates this token on every launch;
+                // in production it rotates far less frequently (days/weeks).
             }
         }
     }

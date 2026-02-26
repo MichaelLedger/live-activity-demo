@@ -171,7 +171,7 @@ struct EmojiRanger: Hashable, Codable, Identifiable {
         
     }
     
-    static let appGroup = "<App Group Here>"
+    static let appGroup = "group.com.example.apple-samplecode.Emoji-RangersSXQJRCS9S9"
     
     static func setLastSelectedHero(hero: EmojiRanger) throws {
         EmojiRanger.emojiDefaults.setValue(try JSONEncoder().encode(hero), forKey: "hero")

@@ -154,6 +154,8 @@ final class AdventureViewModel: ObservableObject {
     @Published var errorMessage: String? = nil
     
     private var currentActivity: Activity<AdventureAttributes>? = nil
+    // Retained so the observer streams are not cancelled prematurely.
+    private var activityObserverTask: Task<Void, Never>? = nil
     
     func loadAdventure(hero: EmojiRanger) {
         let activitiesForHero = Activity<AdventureAttributes>.activities.filter {
@@ -183,6 +185,23 @@ final class AdventureViewModel: ObservableObject {
                     content: .init(state: initialState, staleDate: nil),
                     pushType: .token
                 )
+                
+                // Observe and log every push-to-update token rotation.
+                // Use the latest token logged here when sending update/end pushes.
+                // In sandbox this token rotates on every app launch — always use
+                // the most recent value; the previous token becomes immediately invalid.
+                Task {
+                    let bundleID = Bundle.main.bundleIdentifier ?? "<bundle-id>"
+                    for await tokenData in activity.pushTokenUpdates {
+                        let tokenString = tokenData.reduce("") { $0 + String(format: "%02x", $1) }
+                        Logger().info("""
+                            [Push-to-Update] Token (use for update/end pushes):
+                              activity : \(activity.id)
+                              token    : \(tokenString)
+                              topic    : \(bundleID).push-type.liveactivity
+                            """)
+                    }
+                }
                 
                 self.setup(withActivity: activity)
             } catch {
@@ -257,7 +276,8 @@ private extension AdventureViewModel {
     }
     
     func observeActivity(activity: Activity<AdventureAttributes>) {
-        Task {
+        activityObserverTask?.cancel()
+        activityObserverTask = Task {
             await withTaskGroup(of: Void.self) { group in
                 group.addTask { @MainActor in
                     for await activityState in activity.activityStateUpdates {
@@ -279,7 +299,7 @@ private extension AdventureViewModel {
                     for await pushToken in activity.pushTokenUpdates {
                         let pushTokenString = pushToken.hexadecimalString
                         
-                        Logger().debug("New push token: \(pushTokenString)")
+                        Logger().info("[Push-to-Update] Token rotated for activity \(activity.id): \(pushTokenString)")
                         
                         do {
                             let frequentUpdateEnabled = ActivityAuthorizationInfo().frequentPushesEnabled

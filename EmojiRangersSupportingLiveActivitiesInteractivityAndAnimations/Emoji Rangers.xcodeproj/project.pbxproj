@@ -79,6 +79,10 @@
 		344C105929F1C6FD0075E3DA /* AdventureLiveActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344C105529F1BE920075E3DA /* AdventureLiveActivityView.swift */; };
 		344C105A29F1C6FD0075E3DA /* AdventureLiveActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344C105529F1BE920075E3DA /* AdventureLiveActivityView.swift */; };
 		344C105D29F1CC2E0075E3DA /* AdventureActivityConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344C105B29F1C97F0075E3DA /* AdventureActivityConfiguration.swift */; };
+		6780858C2F5020650072A475 /* MasterPortraitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6780858B2F5020650072A475 /* MasterPortraitStore.swift */; };
+		6780858D2F5020650072A475 /* MasterPortraitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6780858B2F5020650072A475 /* MasterPortraitStore.swift */; };
+		6780858E2F5020650072A475 /* MasterPortraitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6780858B2F5020650072A475 /* MasterPortraitStore.swift */; };
+		6780858F2F5020650072A475 /* MasterPortraitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6780858B2F5020650072A475 /* MasterPortraitStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -187,6 +191,7 @@
 		344C105329F1BCCC0075E3DA /* AdventureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureView.swift; sourceTree = "<group>"; };
 		344C105529F1BE920075E3DA /* AdventureLiveActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureLiveActivityView.swift; sourceTree = "<group>"; };
 		344C105B29F1C97F0075E3DA /* AdventureActivityConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureActivityConfiguration.swift; sourceTree = "<group>"; };
+		6780858B2F5020650072A475 /* MasterPortraitStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterPortraitStore.swift; sourceTree = "<group>"; };
 		92D81A36B209034BE7D3F8CC /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		DC24FA84EA396AD2BAD8BDF3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E68FC7C59970E72A6D9463B8 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
@@ -310,6 +315,7 @@
 		1F7D0EE529F13F4C00AB9D92 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				6780858B2F5020650072A475 /* MasterPortraitStore.swift */,
 				344C104D29F1BCA10075E3DA /* AdventureAttributes.swift */,
 				1F7D0EEB29F13F8000AB9D92 /* EmojiRanger.swift */,
 			);
@@ -620,6 +626,7 @@
 				344C104E29F1BCA10075E3DA /* AdventureAttributes.swift in Sources */,
 				1F7D0EF729F13F8500AB9D92 /* HeroNameView.swift in Sources */,
 				344C105429F1BCCD0075E3DA /* AdventureView.swift in Sources */,
+				6780858F2F5020650072A475 /* MasterPortraitStore.swift in Sources */,
 				1F7D0EF529F13F8500AB9D92 /* AvatarView.swift in Sources */,
 				1F7D0EEA29F13F7A00AB9D92 /* ImageURLProtocol.swift in Sources */,
 				344C105629F1BE920075E3DA /* AdventureLiveActivityView.swift in Sources */,
@@ -643,6 +650,7 @@
 				1F7D0F0B29F1403400AB9D92 /* EmojiRangersWidgetBundle.swift in Sources */,
 				1F7D0F2329F140DC00AB9D92 /* HealthLevelShape.swift in Sources */,
 				1F7D0F2429F140DC00AB9D92 /* HeroNameView.swift in Sources */,
+				6780858C2F5020650072A475 /* MasterPortraitStore.swift in Sources */,
 				1F7D0F2A29F1410600AB9D92 /* ImageURLProtocol.swift in Sources */,
 				0F3AB88D2A01B3220001A5DB /* EmojiRangerSelection.swift in Sources */,
 				1F7D0F2529F140DC00AB9D92 /* AvatarView.swift in Sources */,
@@ -666,6 +674,7 @@
 				1F7D0F6029F1437000AB9D92 /* EmojiRanger.swift in Sources */,
 				344C105129F1BCAB0075E3DA /* AdventureAttributes.swift in Sources */,
 				1F7D0F6629F1437600AB9D92 /* ImageURLProtocol.swift in Sources */,
+				6780858D2F5020650072A475 /* MasterPortraitStore.swift in Sources */,
 				344C105929F1C6FD0075E3DA /* AdventureLiveActivityView.swift in Sources */,
 				0F3AB8912A01B7480001A5DB /* EmojiRangerSelection.swift in Sources */,
 				1F7D0F6229F1437300AB9D92 /* AllCharactersView.swift in Sources */,
@@ -683,6 +692,7 @@
 				344C105A29F1C6FD0075E3DA /* AdventureLiveActivityView.swift in Sources */,
 				0FEF6DC62BC0B96D00B8FF67 /* SuperCharge.swift in Sources */,
 				1F7D0F8729F143F800AB9D92 /* HeroNameView.swift in Sources */,
+				6780858E2F5020650072A475 /* MasterPortraitStore.swift in Sources */,
 				1F7D0F7E29F143D800AB9D92 /* EmojiRangersWidget.swift in Sources */,
 				1F7D0F8529F143F800AB9D92 /* HealthLevelShape.swift in Sources */,
 				0FEF6DC72BC0B97300B8FF67 /* EmojiRangerSelection.swift in Sources */,

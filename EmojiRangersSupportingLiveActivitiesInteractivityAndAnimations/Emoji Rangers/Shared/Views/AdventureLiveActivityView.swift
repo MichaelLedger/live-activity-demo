@@ -14,22 +14,51 @@ struct AdventureLiveActivityContent: View {
     let hero: EmojiRanger
     let isStale: Bool
     let contentState: AdventureAttributes.ContentState
-    
+
     var body: some View {
         VStack(alignment: .center) {
             HStack {
                 LiveActivityAvatarView(hero: hero)
-                
+
                 Spacer()
-                
+
+                MasterPortraitView(size: 36)
+
                 OneLineStatsView(hero: hero, isStale: isStale)
             }
-            
+
             HealthBar(currentHealthLevel: contentState.currentHealthLevel)
-            
+
             EventDescriptionView(hero: hero, contentState: contentState)
         }
         .foregroundStyle(Color.textColor)
+    }
+}
+
+/// Renders the owner/master portrait from the App Group container.
+///
+/// The image is saved by the main app via MasterPortraitStore.save() before
+/// the Live Activity starts. It is loaded here using UIImage(contentsOfFile:)
+/// which is the correct approach for user-selected runtime images in widget
+/// extensions — asset catalogs only work for build-time images.
+///
+/// The image is pre-scaled to 108×108 px (36pt @3x) by MasterPortraitStore
+/// to stay within Live Activity image size limits.
+struct MasterPortraitView: View {
+    let size: CGFloat
+
+    var body: some View {
+        if let url = MasterPortraitStore.fileURL,
+           FileManager.default.fileExists(atPath: url.path),
+           let uiImage = UIImage(contentsOfFile: url.path) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.white.opacity(0.6), lineWidth: 1.5))
+                .accessibilityLabel("Owner portrait")
+        }
     }
 }
 
