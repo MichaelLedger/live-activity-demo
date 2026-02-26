@@ -50,12 +50,13 @@ extension AdventureViewModel {
             supercharged: EmojiRanger.herosAreSupercharged()
         )
         
+        // Use default (camelCase) key encoding — this matches what ActivityKit's
+        // APNs decoder expects in the "content-state" payload field.
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
-        encoder.keyEncodingStrategy = .convertToSnakeCase
         
         let json = try! encoder.encode(contentState)
-        Logger().log("\(String(data: json, encoding: .utf8)!)")
+        Logger().log("content-state (camelCase, use this in APNs payload):\n\(String(data: json, encoding: .utf8)!)")
     }
     
     func showWarningBadge(_ shouldShow: Bool) {
