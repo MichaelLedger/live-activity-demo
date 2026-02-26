@@ -83,6 +83,10 @@
 		6780858D2F5020650072A475 /* MasterPortraitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6780858B2F5020650072A475 /* MasterPortraitStore.swift */; };
 		6780858E2F5020650072A475 /* MasterPortraitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6780858B2F5020650072A475 /* MasterPortraitStore.swift */; };
 		6780858F2F5020650072A475 /* MasterPortraitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6780858B2F5020650072A475 /* MasterPortraitStore.swift */; };
+		678085912F502DD40072A475 /* ERVisionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678085902F502DD40072A475 /* ERVisionHelper.swift */; };
+		678085922F502DD40072A475 /* ERVisionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678085902F502DD40072A475 /* ERVisionHelper.swift */; };
+		678085932F502DD40072A475 /* ERVisionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678085902F502DD40072A475 /* ERVisionHelper.swift */; };
+		678085942F502DD40072A475 /* ERVisionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678085902F502DD40072A475 /* ERVisionHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -192,6 +196,7 @@
 		344C105529F1BE920075E3DA /* AdventureLiveActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureLiveActivityView.swift; sourceTree = "<group>"; };
 		344C105B29F1C97F0075E3DA /* AdventureActivityConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureActivityConfiguration.swift; sourceTree = "<group>"; };
 		6780858B2F5020650072A475 /* MasterPortraitStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterPortraitStore.swift; sourceTree = "<group>"; };
+		678085902F502DD40072A475 /* ERVisionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ERVisionHelper.swift; sourceTree = "<group>"; };
 		92D81A36B209034BE7D3F8CC /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		DC24FA84EA396AD2BAD8BDF3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E68FC7C59970E72A6D9463B8 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
@@ -315,6 +320,7 @@
 		1F7D0EE529F13F4C00AB9D92 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				678085902F502DD40072A475 /* ERVisionHelper.swift */,
 				6780858B2F5020650072A475 /* MasterPortraitStore.swift */,
 				344C104D29F1BCA10075E3DA /* AdventureAttributes.swift */,
 				1F7D0EEB29F13F8000AB9D92 /* EmojiRanger.swift */,
@@ -621,6 +627,7 @@
 				1F7D0EF829F13F8500AB9D92 /* HealthLevelShape.swift in Sources */,
 				1F7D0EFE29F13F9900AB9D92 /* DetailView.swift in Sources */,
 				1F7D0ED929F13EED00AB9D92 /* ContentView.swift in Sources */,
+				678085942F502DD40072A475 /* ERVisionHelper.swift in Sources */,
 				1F7D0ED729F13EED00AB9D92 /* EmojiRangersApp.swift in Sources */,
 				0F9003652A059DC400B4B946 /* SuperCharge.swift in Sources */,
 				344C104E29F1BCA10075E3DA /* AdventureAttributes.swift in Sources */,
@@ -645,6 +652,7 @@
 				1F7D0F1F29F1407500AB9D92 /* LeaderboardWidget.swift in Sources */,
 				344C104F29F1BCAA0075E3DA /* AdventureAttributes.swift in Sources */,
 				344C105729F1C6FB0075E3DA /* AdventureLiveActivityView.swift in Sources */,
+				678085932F502DD40072A475 /* ERVisionHelper.swift in Sources */,
 				0F9003662A059DC400B4B946 /* SuperCharge.swift in Sources */,
 				0FAD0CAE2A2808A700BB951F /* IOSIntentProvider.swift in Sources */,
 				1F7D0F0B29F1403400AB9D92 /* EmojiRangersWidgetBundle.swift in Sources */,
@@ -678,6 +686,7 @@
 				344C105929F1C6FD0075E3DA /* AdventureLiveActivityView.swift in Sources */,
 				0F3AB8912A01B7480001A5DB /* EmojiRangerSelection.swift in Sources */,
 				1F7D0F6229F1437300AB9D92 /* AllCharactersView.swift in Sources */,
+				678085922F502DD40072A475 /* ERVisionHelper.swift in Sources */,
 				1F7D0F6129F1437300AB9D92 /* GameColors.swift in Sources */,
 				1F7D0F6529F1437300AB9D92 /* HeroNameView.swift in Sources */,
 			);
@@ -696,6 +705,7 @@
 				1F7D0F7E29F143D800AB9D92 /* EmojiRangersWidget.swift in Sources */,
 				1F7D0F8529F143F800AB9D92 /* HealthLevelShape.swift in Sources */,
 				0FEF6DC72BC0B97300B8FF67 /* EmojiRangerSelection.swift in Sources */,
+				678085912F502DD40072A475 /* ERVisionHelper.swift in Sources */,
 				1F7D0F8329F143F500AB9D92 /* ImageURLProtocol.swift in Sources */,
 				1F7D0F8929F143FA00AB9D92 /* EmojiRanger.swift in Sources */,
 				1F7D0F8629F143F800AB9D92 /* AvatarView.swift in Sources */,

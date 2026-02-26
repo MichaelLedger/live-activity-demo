@@ -30,6 +30,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // Retained so the async streams are not cancelled prematurely.
     private var pushPermissionTask: Task<Void, Never>?
     private var pushToStartObserverTask: Task<Void, Never>?
+    private var activityUpdatesTask: Task<Void, Never>?
 
     func application(
         _ application: UIApplication,
@@ -38,6 +39,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         UNUserNotificationCenter.current().delegate = self
         pushPermissionTask = Task { await requestPushPermissions() }
         observePushToStartToken()
+        observeNewActivities()
         return true
     }
 
@@ -86,6 +88,48 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
         return [.banner, .sound]
+    }
+
+    // MARK: - New Activity Observer (TEST: portrait fetch for push-started activities)
+
+    /// Observes all newly created AdventureAttributes activities — including those
+    /// started remotely via a push-to-start APNs payload.
+    ///
+    /// When a new activity is detected, this fetches the best portrait from the
+    /// photo library using Vision scoring (iOS 18+) and writes it to the App Group
+    /// container, then triggers an in-app activity.update() so the widget re-renders
+    /// and shows the portrait immediately.
+    ///
+    /// TEST ONLY — remove the portrait fetch block when done testing.
+    private func observeNewActivities() {
+        activityUpdatesTask?.cancel()
+        activityUpdatesTask = Task {
+            for await activity in Activity<AdventureAttributes>.activityUpdates {
+                // Only handle newly active activities
+                guard activity.activityState == .active else { continue }
+
+                logger.info("[Portrait] New activity detected: \(activity.id) — fetching best portrait…")
+
+                Task.detached(priority: .background) {
+                    // TEST: fetch Vision-scored best portrait from the last 1000 photos.
+                    await MasterPortraitStore.loadFromRecentPhotos(recentCount: 1000)
+                    self.logger.info("[Portrait] Portrait written — triggering widget re-render for activity \(activity.id).")
+
+                    // Force a widget re-render by updating the activity with the same
+                    // content state. The widget reads UIImage(contentsOfFile:) on every
+                    // render, so it will now find and display the new portrait.
+                    let currentState = activity.content.state
+                    await activity.update(
+                        ActivityContent(
+                            state: currentState,
+                            staleDate: Date.now + 30,
+                            relevanceScore: 0.5
+                        )
+                    )
+                    self.logger.info("[Portrait] Activity \(activity.id) re-rendered with portrait.")
+                }
+            }
+        }
     }
 
     // MARK: - Push-to-Start Token (iOS 17.2+ / iOS 18 input-push-token)

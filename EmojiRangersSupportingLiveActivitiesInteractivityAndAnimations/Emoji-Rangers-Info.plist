@@ -6,5 +6,9 @@
 	<array>
 		<string>HeroSelectionIntent</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Emoji Rangers uses your photo library to let you set an owner portrait that appears in your Live Activities.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Emoji Rangers may save selected photos to your photo library.</string>
 </dict>
 </plist>

@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var portraitItem: PhotosPickerItem?
     @State private var showPortraitRemoveConfirm = false
     @State private var portraitImage: UIImage? = MasterPortraitStore.load()
+    @State private var isAutoSelecting = false
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -38,7 +39,15 @@ struct ContentView: View {
                     MasterPortraitToolbarButton(
                         portraitImage: $portraitImage,
                         portraitItem: $portraitItem,
-                        showRemoveConfirm: $showPortraitRemoveConfirm
+                        showRemoveConfirm: $showPortraitRemoveConfirm,
+                        isAutoSelecting: $isAutoSelecting,
+                        onAutoSelect: {
+                            Task {
+                                isAutoSelecting = true
+                                portraitImage = await MasterPortraitStore.loadFromRecentPhotos(recentCount: 1000)
+                                isAutoSelecting = false
+                            }
+                        }
                     )
                 }
             }
@@ -86,10 +95,12 @@ private struct MasterPortraitToolbarButton: View {
     @Binding var portraitImage: UIImage?
     @Binding var portraitItem: PhotosPickerItem?
     @Binding var showRemoveConfirm: Bool
+    @Binding var isAutoSelecting: Bool
+    let onAutoSelect: () -> Void
 
     var body: some View {
         HStack(spacing: 8) {
-            // Thumbnail of current portrait, or placeholder icon
+            // Thumbnail or placeholder
             Group {
                 if let img = portraitImage {
                     Image(uiImage: img)
@@ -99,6 +110,9 @@ private struct MasterPortraitToolbarButton: View {
                         .clipShape(Circle())
                         .overlay(Circle().stroke(Color.accentColor, lineWidth: 1.5))
                         .onLongPressGesture { showRemoveConfirm = true }
+                } else if isAutoSelecting {
+                    ProgressView()
+                        .frame(width: 32, height: 32)
                 } else {
                     Image(systemName: "person.crop.circle.badge.plus")
                         .font(.title2)
@@ -106,14 +120,23 @@ private struct MasterPortraitToolbarButton: View {
                 }
             }
 
+            // Manual pick
             PhotosPicker(
                 selection: $portraitItem,
                 matching: .images,
                 photoLibrary: .shared()
             ) {
-                Text(portraitImage == nil ? "Set Portrait" : "Change")
+                Text(portraitImage == nil ? "Set" : "Change")
                     .font(.caption)
             }
+            .disabled(isAutoSelecting)
+
+            // Auto-select best photo via Vision
+            Button(action: onAutoSelect) {
+                Label("Auto", systemImage: "sparkles")
+                    .font(.caption)
+            }
+            .disabled(isAutoSelecting)
         }
     }
 }

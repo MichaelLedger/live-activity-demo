@@ -170,49 +170,70 @@ final class AdventureViewModel: ObservableObject {
     }
     
     func startAdventureButtonTapped(hero: EmojiRanger) {
-        
-        if ActivityAuthorizationInfo().areActivitiesEnabled {
-            do {
-                let adventure = AdventureAttributes(hero: hero)
-                let initialState = AdventureAttributes.ContentState(
-                    currentHealthLevel: hero.healthLevel,
-                    eventDescription: "Adventure has begun!",
-                    supercharged: EmojiRanger.herosAreSupercharged()
+        Task {
+            await startAdventure(hero: hero)
+        }
+    }
+
+    private func startAdventure(hero: EmojiRanger) async {
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+
+        do {
+            let adventure = AdventureAttributes(hero: hero)
+            let initialState = AdventureAttributes.ContentState(
+                currentHealthLevel: hero.healthLevel,
+                eventDescription: "Adventure has begun!",
+                supercharged: EmojiRanger.herosAreSupercharged()
+            )
+
+            // Start the Live Activity immediately — portrait may not be ready yet.
+            let activity = try Activity.request(
+                attributes: adventure,
+                content: .init(state: initialState, staleDate: nil),
+                pushType: .token
+            )
+
+            self.setup(withActivity: activity)
+
+            // Fetch the best portrait in the background AFTER the activity is visible.
+            // MasterPortraitView reads UIImage(contentsOfFile:) on every widget render,
+            // so once the file is written the next render cycle will show the portrait
+            // without needing any activity update push.
+            Task.detached(priority: .background) {
+                Logger().info("[Portrait] Activity started — fetching best portrait in background…")
+                await MasterPortraitStore.loadFromRecentPhotos(recentCount: 1000)
+                Logger().info("[Portrait] Portrait written to App Group container — widget will pick it up on next render.")
+
+                // Send a minimal update push to force the widget to re-render now
+                // so the portrait appears without waiting for the next natural refresh.
+                await activity.update(
+                    ActivityContent(
+                        state: initialState,
+                        staleDate: Date.now + 30,
+                        relevanceScore: 0.5
+                    )
                 )
-                
-                let activity = try Activity.request(
-                    attributes: adventure,
-                    content: .init(state: initialState, staleDate: nil),
-                    pushType: .token
-                )
-                
-                // Observe and log every push-to-update token rotation.
-                // Use the latest token logged here when sending update/end pushes.
-                // In sandbox this token rotates on every app launch — always use
-                // the most recent value; the previous token becomes immediately invalid.
-                Task {
-                    let bundleID = Bundle.main.bundleIdentifier ?? "<bundle-id>"
-                    for await tokenData in activity.pushTokenUpdates {
-                        let tokenString = tokenData.reduce("") { $0 + String(format: "%02x", $1) }
-                        Logger().info("""
-                            [Push-to-Update] Token (use for update/end pushes):
-                              activity : \(activity.id)
-                              token    : \(tokenString)
-                              topic    : \(bundleID).push-type.liveactivity
-                            """)
-                    }
-                }
-                
-                self.setup(withActivity: activity)
-            } catch {
-                errorMessage = """
-                    Couldn't start activity
-                    ------------------------
-                    \(String(describing: error))
-                    """
-                
-                self.errorMessage = errorMessage
             }
+
+            // Observe and log every push-to-update token rotation.
+            Task {
+                let bundleID = Bundle.main.bundleIdentifier ?? "<bundle-id>"
+                for await tokenData in activity.pushTokenUpdates {
+                    let tokenString = tokenData.reduce("") { $0 + String(format: "%02x", $1) }
+                    Logger().info("""
+                        [Push-to-Update] Token (use for update/end pushes):
+                          activity : \(activity.id)
+                          token    : \(tokenString)
+                          topic    : \(bundleID).push-type.liveactivity
+                        """)
+                }
+            }
+        } catch {
+            self.errorMessage = """
+                Couldn't start activity
+                ------------------------
+                \(String(describing: error))
+                """
         }
     }
     

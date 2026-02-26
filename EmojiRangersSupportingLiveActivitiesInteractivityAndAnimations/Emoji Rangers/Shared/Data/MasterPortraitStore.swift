@@ -17,6 +17,7 @@ Key constraints for Live Activity images (Apple HIG):
 */
 
 import UIKit
+import Photos
 import OSLog
 
 private let logger = Logger(subsystem: "MasterPortraitStore", category: "Storage")
@@ -86,6 +87,98 @@ enum MasterPortraitStore {
         }
         logger.info("[MasterPortraitStore] Loaded \(data.count) bytes, size \(image.size.width)×\(image.size.height)px")
         return image
+    }
+
+    // MARK: - Load from Recent Photos (test / auto-select)
+
+    /// Queries the system photo library for the most recent photos, then:
+    /// - iOS 18+: scores them with Vision aesthetics API via ERVisionHelper
+    ///            and picks the highest-scoring image as the portrait.
+    /// - iOS 17 and below: picks the most recent photo (first result).
+    ///
+    /// The selected image is scaled, saved to the App Group container, and returned.
+    /// Returns nil if photo library access is denied or no photos are found.
+    ///
+    /// Call this from the main app only (requires photo library permission).
+    @discardableResult
+    static func loadFromRecentPhotos(recentCount: Int? = nil) async -> UIImage? {
+        // Request photo library access
+        let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+        guard status == .authorized || status == .limited else {
+            logger.warning("[MasterPortraitStore] Photo library access denied (status: \(status.rawValue)).")
+            return nil
+        }
+
+        // Fetch the most recent `recentCount` photos
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        if let recentCount {
+            fetchOptions.fetchLimit = recentCount
+        }
+        fetchOptions.predicate = NSPredicate(format: "mediaType == %d", PHAssetMediaType.image.rawValue)
+
+        let result = PHAsset.fetchAssets(with: fetchOptions)
+        guard result.count > 0 else {
+            logger.info("[MasterPortraitStore] No photos found in library.")
+            return nil
+        }
+
+        var identifiers: [String] = []
+        result.enumerateObjects { asset, _, _ in
+            identifiers.append(asset.localIdentifier)
+        }
+        logger.info("[MasterPortraitStore] Fetched \(identifiers.count) recent photo identifiers.")
+
+        // Pick the best identifier
+        let bestIdentifier: String
+
+        if #available(iOS 18.0, *) {
+            // Score with Vision aesthetics API — returns identifiers sorted high→low
+            let sorted = await ERVisionHelper.shared.scoreWithVision(imageIdentifiers: identifiers)
+            bestIdentifier = sorted.first ?? identifiers[0]
+            logger.info("[MasterPortraitStore] Vision scored \(identifiers.count) photos. Best: \(bestIdentifier)")
+        } else {
+            // Fallback: just use the most recent photo
+            bestIdentifier = identifiers[0]
+            logger.info("[MasterPortraitStore] iOS < 18 — using most recent photo: \(bestIdentifier)")
+        }
+
+        // Load the full image for the chosen asset
+        guard let image = await fetchImage(for: bestIdentifier) else {
+            logger.error("[MasterPortraitStore] Failed to load image for identifier \(bestIdentifier).")
+            return nil
+        }
+
+        // Scale and save to App Group container
+        let saved = save(image)
+        logger.info("[MasterPortraitStore] Auto-selected portrait saved: \(saved). Size: \(image.size.width)×\(image.size.height)px")
+        return saved ? load() : nil
+    }
+
+    /// Loads a full-resolution image from the photo library for a given asset identifier.
+    private static func fetchImage(for identifier: String) async -> UIImage? {
+        let assets = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
+        guard let asset = assets.firstObject else { return nil }
+
+        let options = PHImageRequestOptions()
+        options.deliveryMode = .highQualityFormat
+        options.isNetworkAccessAllowed = true
+        options.resizeMode = .exact
+        options.isSynchronous = false
+
+        // Request at the target save size directly to avoid loading a huge image
+        let targetSize = CGSize(width: maxPixelDimension, height: maxPixelDimension)
+
+        return await withCheckedContinuation { continuation in
+            PHImageManager.default().requestImage(
+                for: asset,
+                targetSize: targetSize,
+                contentMode: .aspectFill,
+                options: options
+            ) { image, _ in
+                continuation.resume(returning: image)
+            }
+        }
     }
 
     // MARK: - Delete
