@@ -161,3 +161,7 @@ Device Token: 8088aae94b3e802f14cba34b1fb2461244edf590c9082a28fe1c96119dbe1486c3
 
 {"aps":{"timestamp":1772177039,"event":"start","input-push-token":1,"attributes-type":"FreePrintsPromoAttributes","attributes":{"promoId":"abc","productType":"4x6 Prints"},"content-state":{"promoTitle":"promo title here","promoSubtitle":"promo sub title here","discount":"50% discount","endTime":"2026-02-27 17:30:00","promoType":"freePrints","progress":0,"currentStep":"","itemCount":20,"isExpired":false},"alert":{"title":"FreePrints promo begun","body":"Start to prints now!"}}}
 ```
+
+### 4. How to debug widget process in Xcode?
+
+Xcode -> Debug -> Attach to process -> Likely Targets -> <LiveActivityWidgetName>
