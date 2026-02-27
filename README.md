@@ -116,3 +116,48 @@ Verify `Info.plist` Entry: Adding the capability via the Xcode interface should 
 <key>NSSupportsLiveActivities</key>
 <true/>
 ``` 
+
+### 3. payload's content-state is in-completed causing live activity cannot be triggered via push
+
+our ContentState is incomplete
+This is the main blocker.
+
+Your Swift type:
+```
+public struct ContentState: Codable, Hashable {
+    var promoTitle: String
+    var promoSubtitle: String
+    var discount: String
+    var endTime: String
+    var promoType: PromoType
+    var progress: Double          // ❌ REQUIRED
+    var currentStep: String       // ❌ REQUIRED
+    var itemCount: Int
+    var isExpired: Bool = false
+}
+```
+
+But your push payload does NOT include:
+```
+"progress"
+"currentStep"
+```
+
+Result
+➡️ JSONDecoder fails
+
+➡️ ActivityKit drops the start silently
+
+➡️ No Live Activity appears
+
+➡️ No logs
+
+➡️ APNs still says 200 OK
+
+Resolution:
+
+```
+Device Token: 8088aae94b3e802f14cba34b1fb2461244edf590c9082a28fe1c96119dbe1486c39960c07130cb0bc6cb4afe767ad50b1e92beaba03fcd80c989d3f4bfa15ce99b94344396c37b5a1ff520ee0eb596fa
+
+{"aps":{"timestamp":1772177039,"event":"start","input-push-token":1,"attributes-type":"FreePrintsPromoAttributes","attributes":{"promoId":"abc","productType":"4x6 Prints"},"content-state":{"promoTitle":"promo title here","promoSubtitle":"promo sub title here","discount":"50% discount","endTime":"2026-02-27 17:30:00","promoType":"freePrints","progress":0,"currentStep":"","itemCount":20,"isExpired":false},"alert":{"title":"FreePrints promo begun","body":"Start to prints now!"}}}
+```
