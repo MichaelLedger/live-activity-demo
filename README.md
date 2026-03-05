@@ -164,4 +164,24 @@ Device Token: 8088aae94b3e802f14cba34b1fb2461244edf590c9082a28fe1c96119dbe1486c3
 
 ### 4. How to debug widget process in Xcode?
 
+[Previewing widgets and Live Activities in Xcode](https://developer.apple.com/documentation/widgetkit/previewing-widgets-and-live-activities-in-xcode?language=objc)
+
+With Xcode previews, you can make changes to your app’s code and see the results quickly in the preview canvas. Using the #Preview macros for widgets, you can preview widgets and Live Activities. The macros allow you to provide timeline entries and content states and click through timeline updates and content changes. As a result, Xcode previews help you quickly and iteratively develop, review, and fine-tune functionality and animations.
+
+[How to debug iOS 14 widget in Xcode 12?](https://stackoverflow.com/questions/64206178/how-to-debug-ios-14-widget-in-xcode-12)
+
+Select the widget target and a simulator.
+
+Set a breakpoint in the widget code.
+
+run the widget target
+
+In Xcode menu select > Debug > Attach To Process > Select the top most widget extension in the list
+
 Xcode -> Debug -> Attach to process -> Likely Targets -> <LiveActivityWidgetName>
+
+Interact with the widget or its preview, and the breakpoint will hit.
+
+*In my case doing this an error appeared that on of my images was bigger than 1080 * 1080 px.*
+
+Select your widget target at the top left corner of Xcode, build and run the app, then the widget process will be able to debug and show logs. This example project is downloaded provided by Apple: [building_widgets_using_widgetkit_and_swiftui] (https://developer.apple.com/documentation/widgetkit/building_widgets_using_widgetkit_and_swiftui).
